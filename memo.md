@@ -118,3 +118,63 @@ $ ansible --list-hosts all
     control
 
 ```
+
+---
+- host selection(Patterns)
+
+```
+$ ansible --list-hosts "*"
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (5):
+    lb01
+    app01
+    app02
+    db01
+    control
+
+$ ansible --list-hosts loadbalancer
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (1):
+    lb01
+
+$ ansible --list-hosts webserver
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (2):
+    app01
+    app02
+
+$ ansible --list-hosts "app0*"
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (2):
+    app01
+    app02
+
+
+// 複数のグループを対象
+ $ ansible --list-hosts database,control
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (2):
+    db01
+    control
+
+
+$ ansible --list-hosts webserver
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (2):
+    app01
+    app02
+
+// グループ内の特定のホストを対象
+$ ansible --list-hosts webserver[0]
+ [WARNING]: Found both group and host with same name: control
+
+  hosts (1):
+    app01
+
+```
