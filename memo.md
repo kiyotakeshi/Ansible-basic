@@ -178,3 +178,129 @@ $ ansible --list-hosts webserver[0]
     app01
 
 ```
+
+---
+- コマンドの実行
+  - GCP上のインスタンスに対して実行
+  - GCP上のインスタンスのセットアップ方法は割愛
+
+```
+$ cat /etc/ansible/hosts
+35.212.254.200 ansible_port=1994
+
+```
+
+```
+$ ansible -m ping all
+
+35.212.254.200 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+
+$ ansible -m command -a "hostname" all
+
+35.232.554.247 | CHANGED | rc=0 >>
+test
+
+```
+
+---
+- playbookの活用
+
+```
+// GCPのインスタンスを対象に追加
+$ cat dev
+
+[test]
+test01 ansible_host=13.112.254.247 ansible_port=1994
+
+[loadbalancer]
+lb01
+
+[webserver]
+app01
+app02
+
+[database]
+db01
+
+[control]
+control ansible_connection=local
+
+```
+
+- playbookディレクトリ内に実行内容を記載したファイルを作成
+
+```
+$ tree
+.
+├── ansible.cfg
+├── dev
+└── playbooks
+    └── hostname.yaml
+
+1 directory, 3 files
+
+$ cat playbooks/hostname.yaml
+---
+  - hosts: all
+    tasks:
+      - command: hostname
+
+```
+
+- 実行
+
+```
+$ ansible-playbook playbooks/hostname.yaml
+ [WARNING]: Found both group and host with same name: control
+
+
+PLAY [all] **************************************************************************************************************
+
+TASK [Gathering Facts] **************************************************************************************************
+fatal: [lb01]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: Could not resolve hostname lb01: nodename nor servname provided, or not known", "unreachable": true}
+fatal: [app01]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: Could not resolve hostname app01: nodename nor servname provided, or not known", "unreachable": true}
+fatal: [app02]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: Could not resolve hostname app02: nodename nor servname provided, or not known", "unreachable": true}
+fatal: [db01]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: Could not resolve hostname db01: nodename nor servname provided, or not known", "unreachable": true}
+ok: [control]
+ok: [test01]
+
+TASK [command] **********************************************************************************************************
+changed: [control]
+changed: [test01]
+
+PLAY RECAP **************************************************************************************************************
+app01                      : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0
+app02                      : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0
+control                    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+db01                       : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0
+lb01                       : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0
+test01                     : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+```
+
+- taskの表示を変えて、何を実行しているかわかりやすくする
+
+```
+$ cat playbooks/hostname.yaml
+---
+  - hosts: all
+    tasks:
+      - name: get server hostname
+        command: hostname
+
+$ ansible-playbook playbooks/hostname.yaml
+ [WARNING]: Found both group and host with same name: control
+
+// nameで指定した表示になる
+TASK [get server hostname] **********************************************************************************************
+changed: [control]
+changed: [test01]
+
+```
+
