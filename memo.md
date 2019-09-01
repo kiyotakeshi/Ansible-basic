@@ -376,3 +376,44 @@ db01                       : ok=2    changed=1    unreachable=0    failed=0    s
 lb01                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
+
+- staticIPの上限を解放する申請をする
+
+```
+// staticIPは本来一つのAZに対して1つまで
+// 無料枠プランを解除した上で申請が必要
+
+Hello,
+
+Your quota request for project '665378372392' has been approved and your
+quota has been adjusted accordingly.
+
+Changed Quota:
++-------------------------+------------------+
+| Region: asia-northeast1 | STATIC_ADDRESSES |
++-------------------------+------------------+
+|         Changes         |      1 -> 4      |
++-------------------------+------------------+
+
+// 2営業日かかるみたい
+// AZを変更してインスタンスを作成し直そうかとしたが、
+// すぐにStaticIPを取得できた
+Thank you for contacting Google Cloud Platform Support.
+
+This message is to confirm that we've received your quota request for
+project 'spheric-crow-251511'. Quota increase requests typically take two
+business days to process. If this quota request is very urgent, please
+respond to this email so that our support agents can have full context when
+processing your quota increase request.
+
+While we make every effort to provide you with a resolution to your case
+within two business days, please understand that some of the quota increase
+requests may require further evaluation which takes additional time.
+
+If you have any further information and clarification you would like to
+include in your request, please feel free to reply to this email.
+
+Best regards,
+Google Cloud Platform Support
+
+```
