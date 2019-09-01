@@ -417,3 +417,55 @@ Best regards,
 Google Cloud Platform Support
 
 ```
+- staticIPにできているかの確認
+
+```
+// always freeインスタンス以外の停止
+// 当然疎通しなくなった
+$ ansible-playbook playbooks/hostname.yaml
+ [WARNING]: Found both group and host with same name: control
+
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [control]
+ok: [app02]
+fatal: [lb01]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host 32.216.2.249 port 1994: Operation timed out", "unreachable": true}
+fatal: [app01]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host 62.216.62.246 port 1994: Operation timed out", "unreachable": true}
+fatal: [db01]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host 64.82.74.132 port 1994: Operation timed out", "unreachable": true}
+
+// インスタンスを再起動、playbook,inventoryの中身は変更しない
+// playbookの中身が実行できていることがわかる
+$ ansible-playbook playbooks/hostname.yaml
+ [WARNING]: Found both group and host with same name: control
+
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [db01]
+ok: [app01]
+ok: [lb01]
+ok: [control]
+ok: [app02]
+
+TASK [get server hostname] *****************************************************
+changed: [control]
+changed: [db01]
+changed: [lb01]
+changed: [app01]
+changed: [app02]
+
+PLAY RECAP *********************************************************************
+app01                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+app02                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+control                    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+db01                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+lb01                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+// staticIPを停止しているインスタンスに紐づけると多少課金されるが
+// 以下の理由より、ansibleの検証はGCP上のインスタンスのIPを固定して行うものとする
+// 1. インスタンスを稼働し続けるよりは安価
+// 2. インスタンスを停止するたびにinventoryのIPを書き直すのも面倒
+```
