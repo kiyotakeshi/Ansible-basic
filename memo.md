@@ -304,3 +304,75 @@ changed: [test01]
 
 ```
 
+---
+- GCP上に4台のホストを用意し、playbookを実行
+
+```
+// ディレクトリ構成の確認
+$ tree
+.
+├── ansible.cfg
+├── dev
+└── playbooks
+    └── hostname.yaml
+
+1 directory, 3 files
+
+// GCP上のホストの情報を対象として登録
+// IPはダミーの物に変えてあり、sshアクセスポートは1994番に変更
+$ cat dev
+
+[loadbalancer]
+lb01 ansible_host=24.85.74.125 ansible_port=1994
+
+[webserver]
+app01 ansible_host=25.212.264.247 ansible_port=1994
+app02 ansible_host=26.242.126.148 ansible_port=1994
+
+[database]
+db01 ansible_host=26.242.117.61 ansible_port=1994
+
+[control]
+control ansible_connection=local
+
+// playbookの確認
+$ cat playbooks/hostname.yaml
+---
+  - hosts: all
+    tasks:
+      - name: get server hostname
+        command: hostname
+
+```
+
+- 実行
+
+```
+$ ansible-playbook playbooks/hostname.yaml
+ [WARNING]: Found both group and host with same name: control
+
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [lb01]
+ok: [db01]
+ok: [app02]
+ok: [control]
+ok: [app01]
+
+TASK [get server hostname] *****************************************************
+changed: [control]
+changed: [db01]
+changed: [lb01]
+changed: [app02]
+changed: [app01]
+
+PLAY RECAP *********************************************************************
+app01                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+app02                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+control                    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+db01                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+lb01                       : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+```
