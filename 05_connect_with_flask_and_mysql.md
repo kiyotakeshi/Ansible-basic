@@ -1,7 +1,7 @@
-### flaskからmysqlに接続しようとしたが失敗
+### flaskからmysqlに接続
 
-- グローバルIPを使っていることが原因？
-    - 時間のある時にローカルIPで検証する
+- app0[12],lbには外部IPでアクセスするが、dbへはwebサーバから内部IPでリクエストする
+    - GCPの場合、**外部IP**,**内部IP**を確認して設定
 
 ---
 
@@ -79,6 +79,7 @@ ii  python-mysqldb          1.3.7-1.1        amd64            Python interface t
 
 ```
 ---
+
 - mysqlのテーブルの設定
 
 ```
@@ -168,6 +169,8 @@ ok: [db01] => (item=python-mysqldb)
 
 ---
 - 接続チェック
+    - 以下のやり方では繋がらない
+    - トラブルシューティングのため一応残しておく
 
 ```
 $ curl app01/db
@@ -198,7 +201,7 @@ ff02::2		ip6-allrouters
 35.202.224.247 app02
 35.203.25.249 lb01
 ```
----
+
 - 詰んだ
     - グローバルIPで設定していたので接続できない
 
@@ -245,4 +248,67 @@ sys.path.insert(0, '/var/www/demo')
 
 from demo import app as application
 
+// GCP上のファーアウォールルールも確認したが、いまいちわからない
+```
+
+---
+- 解決(flaskからdbへ疎通)
+    - 内部IPで疎通するよう設定を変更
+
+```
+$ ssh -p 1994 lb01
+$ ssh -p 1994 db01
+$ ssh -p 1994 app01
+$ ssh -p 1994 app02
+
+$ sudo su -
+
+# vi /etc/hosts
+
+# cat /etc/hosts
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+
+# ansible practice
+# GCPの内部IPを名前解決できるよう設定
+10.146.0.3 lb01
+10.146.0.5 app01
+10.138.0.2 app02
+10.146.0.4 db01
+
+```
+
+- flaskからdbへ接続できることを確認
+
+```
+// app0[12],lbは外部からアクセス可能なため、ローカルMacからcurl
+$ curl app01/db
+Database Connected from ansible-template-3!
+$ curl app02/db
+Database Connected from test!
+$ curl lb01/db
+Database Connected from ansible-template-3!
+$ curl lb01/db
+Database Connected from test!
+
+// ローカルMacは外部IPを名前解決できるようにしておく(再掲)
+kiyota-MacBook-Pro:ansible kiyotatakeshi$ cat /private/etc/hosts
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost
+
+# 外部IPを登録
+# ansible practice
+35.203.50.229 lb01
+35.233.64.216 app01
+35.212.204.147 app02
+34.81.14.105 db01
 ```
