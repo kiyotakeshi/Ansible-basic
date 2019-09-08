@@ -137,3 +137,46 @@ gathering = smart
 
 ```
 
+---
+
+- ターゲットを設定しコマンドを実行
+
+```
+kiyotatakeshi@ansible-controller test_sec]$ pwd
+/home/kiyotatakeshi/practical_guide/test_sec
+
+[kiyotatakeshi@ansible-controller test_sec]$ cat inventory/test_inventory.ini
+[test_servers]
+inside1 ansible_host=10.146.0.7
+inside2 ansible_host=10.146.0.8
+
+[control]
+local ansible_connection=local
+
+
+[kiyotatakeshi@ansible-controller test_sec]$ ansible -i inventory/test_inventory.ini test_servers -m ping
+
+inside2 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+inside1 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+[kiyotatakeshi@ansible-controller test_sec]$ ansible -i inventory/test_inventory.ini control -m ping
+
+local | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
