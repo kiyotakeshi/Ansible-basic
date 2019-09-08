@@ -1,5 +1,8 @@
-- 仮想化をベースとしたクラウドの登場により、インフラのライフサイクルが短くなった
-    - 構成管理を手動で行うと運用コストが肥大化する
+- Ansibleが使われるようになった背景
+    - 仮想化をベースとしたクラウドの登場により、インフラのライフサイクルが短くなった
+        - 構成管理を手動で行うと運用コストが肥大化する
+
+---
 
 - インスタンスのセットアップ
 
@@ -179,4 +182,72 @@ local | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
+```
+
+---
+
+- playbookの実行
+
+
+```
+[kiyotatakeshi@ansible-controller test_sec]$ cat test_playbook.yaml
+
+---
+- hosts: test_servers
+  become: true
+  tasks:
+  - name: create directory
+    file:
+      path: /home/ansible/tmp
+      state: directory
+      mode: 0755
+
+  - name: copy file
+    copy:
+      src: ~/test.txt
+      dest: /home/ansible/tmp/hosts
+      mode: 0644
+
+// 実行
+[kiyotatakeshi@ansible-controller test_sec]$ ansible-playbook -i inventory/test_inventory.ini test_playbook.yaml
+
+PLAY [test_servers] ********************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************
+ok: [inside2]
+ok: [inside1]
+
+TASK [create directory] ****************************************************************************************
+changed: [inside1]
+changed: [inside2]
+
+TASK [copy file] ***********************************************************************************************
+changed: [inside1]
+changed: [inside2]
+
+PLAY RECAP *****************************************************************************************************
+inside1                    : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+inside2                    : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+```
+
+- 確認
+
+```
+[kiyotatakeshi@ansible-controller test_sec]$ ssh inside1
+Last login: Sun Sep  8 23:06:20 2019 from 10.146.0.6
+
+[kiyotatakeshi@ansible-inside01 ~]$ sudo su -
+最終ログイン: 2019/09/08 (日) 23:08:10 UTC日時 pts/0
+[root@ansible-inside01 ~]#
+
+[root@ansible-inside01 ~]# ls -ld /home/ansible/tmp
+drwxr-xr-x. 2 root root 19 Sep  8 23:04 /home/ansible/tmp
+
+[root@ansible-inside01 ~]# ls -l /home/ansible/tmp/hosts
+-rw-r--r--. 1 root root 0 Sep  8 23:04 /home/ansible/tmp/hosts
+
+// 同様に
+[kiyotatakeshi@ansible-controller test_sec]$ ssh inside2
+
 ```
