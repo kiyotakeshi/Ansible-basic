@@ -251,3 +251,5 @@ drwxr-xr-x. 2 root root 19 Sep  8 23:04 /home/ansible/tmp
 [kiyotatakeshi@ansible-controller test_sec]$ ssh inside2
 
 ```
+
+- オペレーションをシンプルにコード化しメンバーが共通の認識で作業を行えるノウハウこそが、自動化推進の第一歩
