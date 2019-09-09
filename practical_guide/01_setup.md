@@ -252,4 +252,36 @@ drwxr-xr-x. 2 root root 19 Sep  8 23:04 /home/ansible/tmp
 
 ```
 
+- 最終的なディレクトリ構成
+
+```
+[kiyotatakeshi@ansible-controller ~]$ tree -L 2 -a
+.
+├── .ansible
+│   ├── ansible.log
+│   ├── cp
+│   └── tmp
+├── .ansible.cfg
+├── .bash_history
+├── .bash_logout
+├── .bash_profile
+├── .bashrc
+├── .pki
+│   └── nssdb
+├── .ssh
+│   ├── authorized_keys
+│   ├── id_rsa
+│   ├── id_rsa.pub
+│   └── known_hosts
+├── .vscode-server
+│   ├── .3db7e09f3b61f915d03bbfa58e258d6eee843f35.log
+│   ├── bin
+│   ├── data
+│   └── extensions
+├── practical_guide
+│   ├── test_sec
+└── test.txt
+
+```
+
 - オペレーションをシンプルにコード化しメンバーが共通の認識で作業を行えるノウハウこそが、自動化推進の第一歩
