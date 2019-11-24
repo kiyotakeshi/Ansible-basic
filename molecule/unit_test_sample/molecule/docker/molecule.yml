@@ -1,0 +1,40 @@
+---
+scenario:
+  name: docker
+driver:
+  name: docker
+lint:
+  name: yamllint
+  options:
+    config-file: ${MOLECULE_PROJECT_DIRECTORY}/molecule/shared/yaml-lint.yml
+platforms:
+  - name: instance
+    image: centos:7
+    env:
+      ENVIRONMENT: ${ENVIRONMENT}
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ${MOLECULE_PROJECT_DIRECTORY}/molecule/shared/playbook.yml
+    verify: ${MOLECULE_PROJECT_DIRECTORY}/molecule/shared/verify.yml
+    prepare: ${MOLECULE_PROJECT_DIRECTORY}/molecule/shared/prepare.yml
+  config_options:
+    diff:
+      always: true
+  lint:
+    name: ansible-lint
+  env:
+    ENVIRONMENT: ${ENVIRONMENT}
+verifier:
+  name: goss
+  lint:
+    name: yamllint
+    options:
+      config-file: ${MOLECULE_PROJECT_DIRECTORY}/molecule/shared/yaml-lint.yml
+  directory: ../shared/tests

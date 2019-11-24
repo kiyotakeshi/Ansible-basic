@@ -1,0 +1,64 @@
+---
+package:
+  mysql-community-common:
+    installed: true
+    versions:
+    - 5.7.28
+  mysql-community-client:
+    installed: true
+    versions:
+    - 5.7.28
+  mysql-community-server:
+    installed: true
+    versions:
+    - 5.7.28
+
+user:
+  mysql:
+    exists: true
+    groups:
+    - mysql
+    home: /var/lib/mysql
+    shell: /bin/false
+
+group:
+  mysql:
+    exists: true
+
+process:
+  mysqld:
+    running: true
+
+mysqld:
+  enabled: true
+  running: true
+
+
+file:
+  /root/.my.cnf:
+    exists: true
+    mode: "0600"
+    owner: root
+    group: root
+    filetype: file
+
+command:
+  mysql -e "select User from mysql.user" | grep mysql.session:
+    exit-status: 0
+    stdout:
+    - mysql.session
+    timeout: 10000
+
+command:
+  mysql -e "select User from mysql.user" | grep mysql.sys:
+    exit-status: 0
+    stdout:
+    - mysql.sys
+    timeout: 10000
+
+command:
+  mysql -e "select User from mysql.user" | grep root:
+    exit-status: 0
+    stdout:
+    - root
+    timeout: 10000

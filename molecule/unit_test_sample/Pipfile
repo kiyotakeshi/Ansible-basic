@@ -1,0 +1,29 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+ansible = "==2.9.1"
+molecule = {extras = ['vagrant'],version = "==2.22"}
+docker = "==4.1.0"
+python-vagrant = "==0.5.15"
+requests = "*"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+test = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml test --scenario-name docker"
+converge = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml converge --scenario-name docker"
+login = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml login --scenario-name docker"
+destroy = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml destroy --scenario-name docker"
+syntax = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml --debug syntax --scenario-name docker"
+
+test-vagrant = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml test --scenario-name vagrant"
+converge-vagrant = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml converge --scenario-name vagrant"
+login-vagrant = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml login --scenario-name vagrant"
+destroy-vagrant = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml destroy --scenario-name vagrant"
+syntax-vagrant = "molecule --base-config ./molecule/docker/molecule.yml --env-file ./molecule/shared/.env.yml --debug syntax --scenario-name vagrant"

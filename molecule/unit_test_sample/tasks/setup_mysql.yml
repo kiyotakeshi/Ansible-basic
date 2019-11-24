@@ -1,0 +1,23 @@
+---
+- name: MySQL community repository addition
+  yum:
+    name: "{{ mysql_community_noarch_rpm }}"
+    state: present
+
+- name: Requires the MySQL-python
+  yum:
+    name: MySQL-python
+    state: present
+
+- name: Install MySQL Commnuity Server
+  yum:
+    name: "{{ mysql_install_package_list }}"
+    disablerepo: mysql80-community
+    enablerepo: mysql57-community
+    state: present
+
+- name: Start service mysqld
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
